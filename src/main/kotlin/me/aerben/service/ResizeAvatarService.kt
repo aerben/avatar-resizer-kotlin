@@ -3,7 +3,7 @@ package me.aerben.service
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model.ObjectMetadata
 import net.coobird.thumbnailator.Thumbnails
-import org.apache.commons.io.FilenameUtils
+import org.apache.commons.io.FilenameUtils.getExtension
 import org.apache.commons.io.IOUtils
 import org.apache.log4j.Logger
 
@@ -21,9 +21,7 @@ class ResizeAvatarService {
 
         for (height in Configuration.targetHeights) {
 
-            val sourceImageFileExtension = FilenameUtils.getExtension(sourceKey)
-
-            val targetKey = "$sourceBucket/$sourceKey/${height.toString()}.$sourceImageFileExtension"
+            val targetKey = "$sourceBucket/$sourceKey/$height.${getExtension(sourceKey)}"
 
             val resizedImageData = resizeImageToHeight(avatarData, height)
 
@@ -46,26 +44,18 @@ class ResizeAvatarService {
     }
 
     private fun resizeImageToHeight(imageData: ByteArray, height: Int): ByteArray {
-        try {
-            val baos = ByteArrayOutputStream()
-            Thumbnails.of(ByteArrayInputStream(imageData))
-                    .height(height)
-                    .toOutputStream(baos)
-            return baos.toByteArray()
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
+        val baos = ByteArrayOutputStream()
+        Thumbnails.of(ByteArrayInputStream(imageData))
+                .height(height)
+                .toOutputStream(baos)
+        return baos.toByteArray()
     }
 
     private fun loadAvatarImage(sourceBucket: String, sourceKey: String): ByteArray {
-        try {
-            val `object` = s3.getObject(sourceBucket, sourceKey)
-            val baos = ByteArrayOutputStream()
-            IOUtils.copy(`object`.objectContent, baos)
-            return baos.toByteArray()
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
+        val obj = s3.getObject(sourceBucket, sourceKey)
+        val baos = ByteArrayOutputStream()
+        IOUtils.copy(obj.objectContent, baos)
+        return baos.toByteArray()
     }
 
     companion object {

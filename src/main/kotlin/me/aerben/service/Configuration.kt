@@ -9,7 +9,7 @@ object Configuration {
 
     private val DEFAULT_BUCKET = "bonn-serverless-avatars-resized"
 
-    private val DEFAULT_HEIGHTS = Arrays.asList(128, 256, 512)
+    private val DEFAULT_HEIGHTS = listOf(128, 256, 512)
 
     val targetHeights = loadHeightsFromEnv()
 
@@ -32,13 +32,11 @@ object Configuration {
             LOG.debug("No target heights configured. Using default $DEFAULT_HEIGHTS")
             return DEFAULT_HEIGHTS
         } else {
-            val heights = ArrayList<Int>()
-            for (part in env.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()) {
+            val heights = env.split(",").map {
                 try {
-                    heights.add(Integer.parseInt(part))
+                    Integer.parseInt(it)
                 } catch (e: NumberFormatException) {
-                    throw RuntimeException("Failed to initialize application: " +
-                            "environment variable \$TARGET_RESIZED_HEIGHT contained invalid value " + part)
+                    throw RuntimeException("Environment variable TARGET_HEIGHTS contained invalid value $it")
                 }
             }
             LOG.debug("Using configured heights from env: $heights")
