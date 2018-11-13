@@ -1,7 +1,7 @@
 package me.aerben.service
 
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
-import me.aerben.service.Configuration.resizeAvatarsBucket
+import me.aerben.service.Configuration.targetBucket
 import org.apache.log4j.Logger
 
 class DeleteResizedImagesService {
@@ -11,15 +11,15 @@ class DeleteResizedImagesService {
 
         // Determine the prefix of the resized images in the target bucket
         val prefix = "$sourceBucket/$sourceKey"
-        LOG.info("Looking for objects with prefix $prefix in bucket $resizeAvatarsBucket")
+        LOG.info("Looking for objects with prefix $prefix in bucket $targetBucket")
 
         // List all objects under the prefix and delete each object that matches
-        s3.listObjects(resizeAvatarsBucket, prefix).objectSummaries.forEach { summary ->
-            LOG.info("Deleting object ${summary.key} in bucket $resizeAvatarsBucket")
-            s3.deleteObject(resizeAvatarsBucket, summary.key)
+        s3.listObjects(targetBucket, prefix).objectSummaries.forEach { summary ->
+            LOG.info("Deleting object ${summary.key} in bucket $targetBucket")
+            s3.deleteObject(targetBucket, summary.key)
         }
 
-        LOG.info("Finished deleting objects with prefix $prefix in bucket $resizeAvatarsBucket")
+        LOG.info("Finished deleting objects with prefix $prefix in bucket $targetBucket")
     }
 
     companion object {

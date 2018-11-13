@@ -7,19 +7,19 @@ object Configuration {
 
     private val LOG = Logger.getLogger(Configuration::class.java)
 
-    private val DEFAULT_RESIZED_AVATARS_BUCKET = "bonn-serverless-avatars-resized"
+    private val DEFAULT_BUCKET = "bonn-serverless-avatars-resized"
 
     private val DEFAULT_HEIGHTS = Arrays.asList(128, 256, 512)
 
-    val targetResizedHeights = loadHeightsFromEnv()
+    val targetHeights = loadHeightsFromEnv()
 
-    val resizeAvatarsBucket = loadAvatarsBucketFromEnv()
+    val targetBucket = loadAvatarsBucketFromEnv()
 
     private fun loadAvatarsBucketFromEnv(): String {
-        val env = System.getenv("RESIZED_AVATARS_BUCKET")
+        val env = System.getenv("TARGET_BUCKET")
         if (env == null) {
-            LOG.debug("No resize avatar bucket configured. Using default $DEFAULT_RESIZED_AVATARS_BUCKET")
-            return DEFAULT_RESIZED_AVATARS_BUCKET
+            LOG.debug("No resize avatar bucket configured. Using default $DEFAULT_BUCKET")
+            return DEFAULT_BUCKET
         } else {
             LOG.debug("Using resize avatar bucket from env: $env")
             return env
@@ -27,7 +27,7 @@ object Configuration {
     }
 
     private fun loadHeightsFromEnv(): List<Int> {
-        val env = System.getenv("TARGET_RESIZED_HEIGHTS")
+        val env = System.getenv("TARGET_HEIGHTS")
         if (env == null) {
             LOG.debug("No target heights configured. Using default $DEFAULT_HEIGHTS")
             return DEFAULT_HEIGHTS

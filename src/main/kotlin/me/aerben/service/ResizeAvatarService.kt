@@ -19,7 +19,7 @@ class ResizeAvatarService {
         // Loading the data as InputStream would make it impossible to reuse it for multiple heights
         val avatarData = loadAvatarImage(sourceBucket, sourceKey)
 
-        for (height in Configuration.targetResizedHeights) {
+        for (height in Configuration.targetHeights) {
 
             val sourceImageFileExtension = FilenameUtils.getExtension(sourceKey)
 
@@ -28,7 +28,7 @@ class ResizeAvatarService {
             val resizedImageData = resizeImageToHeight(avatarData, height)
 
             s3.putObject(
-                    Configuration.resizeAvatarsBucket,
+                    Configuration.targetBucket,
                     targetKey,
                     ByteArrayInputStream(resizedImageData),
                     buildMetadata(resizedImageData)

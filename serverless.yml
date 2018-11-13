@@ -21,27 +21,30 @@ provider:
     - "s3:DeleteObject"
     - "s3:PutObject"
     Resource: "arn:aws:s3:::${self:custom.resized-bucket}/*"
+  environment:
+    TARGET_BUCKET: ${self:custom.resized-bucket}
 
 package:
   artifact: build/distributions/avatar-resizer.zip
 
 functions:
-#  delete-avatar:
-#    handler: me.aerben.handlers.DeleteAvatarHandler
-#    environment:
-#      RESIZED_AVATARS_BUCKET: ${self:custom.resized-bucket}
-#    events:
-#    - s3:
-#        bucket: ${self:custom.source-bucket}
-#        event: s3:ObjectRemoved:*
+
+  delete-avatar:
+    handler: me.aerben.handlers.DeleteAvatarHandler
+    events:
+    - s3:
+        bucket: ${self:custom.source-bucket}
+        event: s3:ObjectRemoved:*
+
   resize-avatar:
     handler: me.aerben.handlers.ResizeAvatarHandler
-    environment:
-      RESIZED_AVATARS_BUCKET: ${self:custom.resized-bucket}
     events:
     - s3:
         bucket: ${self:custom.source-bucket}
         event: s3:ObjectCreated:*
+
+  configuration-handler:
+    handler: me.aerben.handlers.ConfigurationHandler
 
 resources:
   Resources:
