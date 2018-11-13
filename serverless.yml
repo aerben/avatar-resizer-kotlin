@@ -1,0 +1,51 @@
+service: avatar-resizer
+
+custom:
+  source-bucket: "svls-avatars"
+  resized-bucket: "svls-resized"
+
+provider:
+  name: aws
+  runtime: java8
+  iamRoleStatements:
+  - Effect: "Allow"
+    Action:
+    - "s3:GetObject"
+    Resource: "arn:aws:s3:::${self:custom.source-bucket}/*"
+  - Effect: "Allow"
+    Action:
+    - "s3:ListBucket"
+    Resource: "arn:aws:s3:::${self:custom.resized-bucket}"
+  - Effect: "Allow"
+    Action:
+    - "s3:DeleteObject"
+    - "s3:PutObject"
+    Resource: "arn:aws:s3:::${self:custom.resized-bucket}/*"
+
+package:
+  artifact: build/distributions/avatar-resizer.zip
+
+functions:
+#  delete-avatar:
+#    handler: me.aerben.handlers.DeleteAvatarHandler
+#    environment:
+#      RESIZED_AVATARS_BUCKET: ${self:custom.resized-bucket}
+#    events:
+#    - s3:
+#        bucket: ${self:custom.source-bucket}
+#        event: s3:ObjectRemoved:*
+  resize-avatar:
+    handler: me.aerben.handlers.ResizeAvatarHandler
+    environment:
+      RESIZED_AVATARS_BUCKET: ${self:custom.resized-bucket}
+    events:
+    - s3:
+        bucket: ${self:custom.source-bucket}
+        event: s3:ObjectCreated:*
+
+resources:
+  Resources:
+    ResizedAvatarsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.resized-bucket}
