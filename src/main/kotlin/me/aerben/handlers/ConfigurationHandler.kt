@@ -5,9 +5,9 @@ import com.amazonaws.services.lambda.runtime.RequestHandler
 import me.aerben.handlers.ConfigurationHandler.ConfigurationResponse
 import me.aerben.service.Configuration
 
-class ConfigurationHandler : RequestHandler<Object, ConfigurationResponse> {
+class ConfigurationHandler : RequestHandler<Any, ConfigurationResponse> {
 
-    override fun handleRequest(input: Object, context: Context): ConfigurationResponse {
+    override fun handleRequest(input: Any, context: Context): ConfigurationResponse {
         return ConfigurationResponse(Configuration.targetHeights, Configuration.targetBucket)
     }
 
