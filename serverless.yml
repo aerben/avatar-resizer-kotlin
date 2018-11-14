@@ -1,8 +1,8 @@
 service: avatar-resizer
 
 custom:
-  source-bucket: "svls-avatars"
-  resized-bucket: "svls-resized"
+  sourceBucket: "svls-avatars"
+  targetBucket: "svls-resized"
 
 provider:
   name: aws
@@ -11,44 +11,45 @@ provider:
   - Effect: "Allow"
     Action:
     - "s3:GetObject"
-    Resource: "arn:aws:s3:::${self:custom.source-bucket}/*"
+    Resource: "arn:aws:s3:::${self:custom.sourceBucket}/*"
   - Effect: "Allow"
     Action:
     - "s3:ListBucket"
-    Resource: "arn:aws:s3:::${self:custom.resized-bucket}"
+    Resource: "arn:aws:s3:::${self:custom.targetBucket}"
   - Effect: "Allow"
     Action:
     - "s3:DeleteObject"
     - "s3:PutObject"
-    Resource: "arn:aws:s3:::${self:custom.resized-bucket}/*"
+    Resource: "arn:aws:s3:::${self:custom.targetBucket}/*"
   environment:
-    TARGET_BUCKET: ${self:custom.resized-bucket}
+    TARGET_BUCKET: ${self:custom.targetBucket}
 
 package:
   artifact: build/distributions/avatar-resizer.zip
 
 functions:
 
-  delete-avatar-handler:
-    handler: me.aerben.handlers.DeleteAvatarHandler
-    events:
-    - s3:
-        bucket: ${self:custom.source-bucket}
-        event: s3:ObjectRemoved:*
-
-  resize-avatar-handler:
+  resizeAvatarHandler:
     handler: me.aerben.handlers.ResizeAvatarHandler
     events:
     - s3:
-        bucket: ${self:custom.source-bucket}
+        bucket: ${self:custom.sourceBucket}
         event: s3:ObjectCreated:*
 
-  configuration-handler:
+  configurationHandler:
     handler: me.aerben.handlers.ConfigurationHandler
+
+  deleteAvatarHandler:
+    handler: me.aerben.handlers.DeleteAvatarHandler
+    events:
+    - s3:
+        bucket: ${self:custom.sourceBucket}
+        event: s3:ObjectRemoved:*
+
 
 resources:
   Resources:
     ResizedAvatarsBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.resized-bucket}
+        BucketName: ${self:custom.targetBucket}
