@@ -29,14 +29,14 @@ package:
 
 functions:
 
-  delete-avatar:
+  delete-avatar-handler:
     handler: me.aerben.handlers.DeleteAvatarHandler
     events:
     - s3:
         bucket: ${self:custom.source-bucket}
         event: s3:ObjectRemoved:*
 
-  resize-avatar:
+  resize-avatar-handler:
     handler: me.aerben.handlers.ResizeAvatarHandler
     events:
     - s3:
